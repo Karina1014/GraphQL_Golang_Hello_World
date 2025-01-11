@@ -1,0 +1,48 @@
+name: Deploy on EC2
+
+on:
+  push:
+    branches:
+      - main  # Ejecuta el flujo de trabajo cuando hay un push a la rama principal
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest  # Usamos un contenedor Ubuntu para este flujo de trabajo
+
+    steps:
+      # Paso 1: Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Paso 2: Login en Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}  # Tu usuario de Docker Hub
+          password: ${{ secrets.DOCKER_PASSWORD }}  # Tu contraseña de Docker Hub
+
+      # Paso 3: Construir la imagen Docker y subirla a Docker Hub
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .  # El contexto de construcción es el directorio actual
+          push: true  # Push de la imagen a Docker Hub
+          tags: janneth5/graphql_golang:${{ github.sha }}  # Etiqueta la imagen con el SHA del commit
+
+      # Paso 4: Desplegar en EC2
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}  # IP pública de tu EC2
+          username: ${{ secrets.EC2_USERNAME }}  # Usuario SSH de tu EC2 (ej. ec2-user o ubuntu)
+          key: ${{ secrets.EC2_PRIVATE_KEY }}  # Clave privada SSH
+          script: |
+            # Detener y eliminar contenedores anteriores si existen
+            sudo docker stop graphql_golang || true
+            sudo docker rm graphql_golang || true
+
+            # Pull de la nueva imagen desde Docker Hub
+            sudo docker pull janneth5/graphql_golang:${{ github.sha }}
+
+            # Ejecutar la nueva imagen Docker
+            sudo docker run -d --name graphql_golang -p 80:80 janneth5/graphql_golang:${{ github.sha }}

@@ -1,0 +1,7 @@
+hello-world
+
+*.git
+*.log
+*.out
+*.exe
+vendor/
