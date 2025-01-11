@@ -3,7 +3,7 @@ name: Deploy on EC2
 on:
   push:
     branches:
-      - main  # Ejecuta el flujo de trabajo cuando haya un push a la rama principal
+      - main  # Ejecuta el flujo de trabajo cuando hay un push a la rama principal
 
 jobs:
   build-test-deploy:
