@@ -3,7 +3,7 @@ name: Deploy on EC2
 on:
   push:
     branches:
-      - main  # Ejecuta el flujo de trabajo cuando hay un push a la rama principal
+      - main  # Ejecuta el flujo de trabajo cuando haya un push a la rama principal
 
 jobs:
   build-test-deploy:
@@ -34,10 +34,21 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}  # IP pública de tu EC2
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}  # Clave privada SSH
+          username: ubuntu  # Usuario para la instancia EC2
+          key: ${{ secrets.EC2_PRIVATE_KEY }}  # Clave privada SSH para acceder a EC2
           script: |
-            # Detener y eliminar contenedores anteriores si existen
+            # Instalar Docker si no está instalado (opcional, para asegurar que Docker esté disponible)
+            if ! command -v docker &> /dev/null; then
+              echo "Docker no encontrado. Instalando Docker..."
+              sudo apt-get update
+              sudo apt-get install -y docker.io
+              sudo systemctl enable docker
+              sudo systemctl start docker
+            else
+              echo "Docker ya está instalado."
+            fi
+
+            # Detener y eliminar el contenedor anterior si existe
             sudo docker stop graphql_golang || true
             sudo docker rm graphql_golang || true
 
