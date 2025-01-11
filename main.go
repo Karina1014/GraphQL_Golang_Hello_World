@@ -15,7 +15,7 @@ func main() {
 			Type: graphql.String, // El tipo de datos que se devolverá es String
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				// El resolver devuelve el mensaje "Hello, world!"
-				return "Hello, world !", nil
+				return "Hello, world!", nil
 			},
 		},
 	}
@@ -30,17 +30,17 @@ func main() {
 		log.Fatalf("Error al crear el esquema: %v", err)
 	}
 
-	// Crea un manejador GraphQL
+	// Crea un manejador GraphQL en la raíz ("/")
 	gqlHandler := handler.New(&handler.Config{
 		Schema:   &schema,
 		Pretty:   true, // Imprime respuestas en formato bonito
 		GraphiQL: true, // Habilita GraphiQL para consultas interactivas
 	})
 
-	// Configura la ruta "/graphql" para manejar las consultas GraphQL
-	http.Handle("/graphql", gqlHandler)
+	// Configura la ruta raíz ("/") para manejar las consultas GraphQL
+	http.Handle("/", gqlHandler)
 
-	// Inicia el servidor HTTP en el puerto 8080
-	log.Println("Servidor GraphQL en ejecución en http://localhost:8080/graphql")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Inicia el servidor HTTP en el puerto 80
+	log.Println("Servidor GraphQL en ejecución en http://localhost:80")
+	log.Fatal(http.ListenAndServe(":80", nil))
 }
