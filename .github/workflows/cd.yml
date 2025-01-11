@@ -34,7 +34,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}  # IP pública de tu EC2
-          username: ${{ secrets.EC2_USERNAME }}  # Usuario SSH de tu EC2 (ej. ec2-user o ubuntu)
+          username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}  # Clave privada SSH
           script: |
             # Detener y eliminar contenedores anteriores si existen
